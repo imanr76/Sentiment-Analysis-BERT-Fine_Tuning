@@ -30,9 +30,10 @@ class sentiment_analyzer(nn.Module):
             param.requires_grad = False
         # Linear layer. Expects inputs of shape (batch_size, 768)
         self.linear1 = nn.Linear(768, 768)
+        self.linear2 = nn.Linear(768, 768)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(dropout)
-        self.linear2 = nn.Linear(768, 1)
+        self.linear3 = nn.Linear(768, 1)
         # The sigmoid layer
         self.sigmoid = nn.Sigmoid()
     
@@ -46,6 +47,9 @@ class sentiment_analyzer(nn.Module):
         x = self.relu(x)
         x = self.dropout(x)
         x = self.linear2(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        x = self.linear3(x)
         return x.view(-1,1)
     
     def train_(self, train_dataloader, validation_dataset, epochs, loss_func, optimizer, device = torch.device("cpu"),threshold = 0.5):
@@ -302,7 +306,7 @@ def train_model(dropout = 0.0, learning_rate = 0.001, epochs = 100, threshold = 
 # Running the script directly
 if __name__ == "__main__":
     
-    dropout = 0.4
+    dropout = 0.3
     # Learning rate for trianing the model
     learning_rate = 0.0001
     # Number of epochs to run
