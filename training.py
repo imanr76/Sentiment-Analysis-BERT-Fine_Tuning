@@ -302,11 +302,11 @@ def train_model(dropout = 0.0, learning_rate = 0.001, epochs = 100, threshold = 
 # Running the script directly
 if __name__ == "__main__":
     
-    dropout = 0.1
+    dropout = 0.4
     # Learning rate for trianing the model
-    learning_rate = 0.00001
+    learning_rate = 0.0001
     # Number of epochs to run
-    epochs = 300
+    epochs = 30
     # Setting the threshold for positive and negative labels
     threshold = 0.5
     
