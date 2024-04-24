@@ -27,8 +27,9 @@ class sentiment_analyzer(nn.Module):
         self.training_info = []
         albert_model.pooler = None
         self.albert = albert_model
-        for param in self.albert.parameters():
-            param.requires_grad = False
+        for name, param in self.albert.named_parameters():
+            if "encoder" not in name:
+                param.requires_grad = False
         # Linear layer. Expects inputs of shape (batch_size, 768)
         self.linear1 = nn.Linear(768, 768)
         self.linear2 = nn.Linear(768, 768)
@@ -44,12 +45,12 @@ class sentiment_analyzer(nn.Module):
         # Running the input sequence through the embedding layer and lstm layer
         x = self.albert(input_ids = input_ids, attention_mask = attention_mask)
         x = x[0][:, 0]
-        x = self.linear1(x)
-        x = self.relu(x)
-        x = self.dropout(x)
-        x = self.linear2(x)
-        x = self.relu(x)
-        x = self.dropout(x)
+        # x = self.linear1(x)
+        # x = self.relu(x)
+        # x = self.dropout(x)
+        # x = self.linear2(x)
+        # x = self.relu(x)
+        # x = self.dropout(x)
         x = self.linear3(x)
         return x.view(-1,1)
     
@@ -174,6 +175,8 @@ class sentiment_analyzer(nn.Module):
         with torch.no_grad():
             correct_sentiments = 0
             run_loss = 0
+            test_sentiment_real_list = torch.tensor([]).to(device)
+            predictions_arg_list = torch.tensor([]).to(device)
             for test_review, test_attention_mask, test_sentiment_real in test_loader:
 
                 test_sentiment_real = test_sentiment_real.view(-1, 1)
@@ -188,9 +191,12 @@ class sentiment_analyzer(nn.Module):
                 correct_sentiments += torch.sum(predictions_arg == test_sentiment_real).item()
                 run_loss +=  self.loss_func(predictions, test_sentiment_real).item()
                 
+                test_sentiment_real_list = torch.cat((test_sentiment_real_list, test_sentiment_real), dim = 0)
+                predictions_arg_list = torch.cat((predictions_arg_list, predictions_arg), dim = 0)
+                
             accuracy = correct_sentiments / len(test_dataset) * 100
             loss = run_loss / len(test_loader)
-            report = classification_report(test_sentiment_real.cpu(), predictions_arg.cpu(), output_dict=True, zero_division=0)
+            report = classification_report(test_sentiment_real_list.cpu(), predictions_arg_list.cpu(), output_dict=True, zero_division=0)
 
             test_info = f"test set loss : {loss:.4}, test set accuracy : {accuracy:.1f}"
             print(test_info)
@@ -328,13 +334,13 @@ if __name__ == "__main__":
     
     dropout = 0.3
     # Learning rate for trianing the model
-    learning_rate = 0.0001
+    learning_rate = 0.00001
     # Number of epochs to run
     epochs = 30
     # Setting the threshold for positive and negative labels
     threshold = 0.5
     #
-    batch_size = 3
+    batch_size = 16
     # Training the model
     report, model = train_model(dropout, learning_rate, epochs, threshold, batch_size)
     

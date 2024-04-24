@@ -1,5 +1,0 @@
-epoch : 1, training loss : 0.0003, training accuracy : 0.0
-epoch : 1, validation loss : 0.0010, validation accuracy : 0.1
-
-
-test set loss : 0.0009899, test set accuracy : 0.0
