@@ -13,8 +13,6 @@ A sample of the traiend model could be found in the models directory. The traine
 
 The specific details of the trained model are as follows and the data used could be found in the data directory: 
 
-- Size of the embedding vector for each token : 20
-
 - Number of head layers : 1
 - Learning rate for trianing the model : 0.0001
 - Number of epochs to run : 30
